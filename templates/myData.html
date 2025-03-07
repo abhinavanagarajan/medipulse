@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediPulse Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f4f8fb;
+            color: #333;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .cortisol-display {
+            font-size: 24px;
+            font-weight: 600;
+            padding: 20px;
+            background: linear-gradient(135deg, #6EC1E4, #3B82F6);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 800px;
+            height: 300px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: 500;
+            color: white;
+            background: linear-gradient(135deg, #34D399, #059669);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+
+            .download-btn {
+                width: 100%;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cortisol-display">
+            <p>Cortisol Level: <span id="cortisolValue">--</span> μg/dL</p>
+            <p>Classification: <span id="cortisolClass">--</span></p>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="heartRateChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="gsrChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="cortisolChart"></canvas>
+        </div>
+
+        <button class="download-btn" onclick="downloadReport()">Download Report</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
