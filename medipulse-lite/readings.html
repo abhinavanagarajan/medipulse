@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sensor Readings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .readings {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            display: none;
+        }
+        .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a76d1;
+        }
+        button {
+            padding: 10px 20px;
+            background: #1a76d1;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0d47a1;
+        }
+        .plot-container {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        .plot-container img {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button onclick="fetchReadings()">Show Readings & Graph</button>
+        
+        <div id="readings" class="readings">
+            <h3>Latest Readings:</h3>
+            <p>Timestamp: <span id="timestamp" class="value">--</span></p>
+            <p>Heart Rate: <span id="heartRate" class="value">--</span> BPM</p>
+            <p>GSR: <span id="gsr" class="value">--</span></p>
+        </div>
+
+        <div id="plot" class="plot-container">
+            <h3>Real-time Graph</h3>
+            <img id="plotImage" src="" alt="Sensor Data Plot">
+        </div>
+    </div>
+
+    <script>
+        function fetchReadings() {
+            fetch('/get-readings')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update readings
+                        document.getElementById('timestamp').textContent = data.timestamp;
+                        document.getElementById('heartRate').textContent = data.heartRate;
+                        document.getElementById('gsr').textContent = data.gsr;
+                        
+                        // Update plot
+                        document.getElementById('plotImage').src = data.plot_url;
+                        
+                        // Show containers
+                        document.getElementById('readings').style.display = 'block';
+                        document.getElementById('plot').style.display = 'block';
+                    } else {
+                        alert('Error fetching readings: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to fetch readings');
+                });
+        }
+    </script>
+</body>
+</html>

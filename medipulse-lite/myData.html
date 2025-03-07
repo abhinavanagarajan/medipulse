@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Health Monitoring</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f2f5;
+        }
+        .dashboard-container {
+            padding: 20px;
+            margin-top: 80px;
+        }
+        .stats-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            height: 300px;
+        }
+        .value-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1A76D1;
+        }
+        .status-high { color: #d32f2f; }
+        .status-medium { color: #f57c00; }
+        .status-normal { color: #388e3c; }
+        .download-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 12px;
+            background: #1a76d1;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .download-btn:hover {
+            background: #0d47a1;
+        }
+        .status-display {
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 20px;
+            color: #666;
+        }
+        
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a76d1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .blink {
+            animation: blink 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes blink {
+            50% { opacity: 0.5; }
+        }
+        .status-text {
+            text-align: center;
+            padding: 5px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status-active { color: #388e3c; }
+        .status-waiting { color: #f57c00; }
+        .status-error { color: #d32f2f; }
+        .value { font-size: 1.2em; font-weight: bold; }
+        #errorMessage {
+            display: none;
+            color: #d32f2f;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .status-message.success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .status-message.error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        .status-message button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            background: #337ab7;
+            color: white;
+            cursor: pointer;
+        }
+        .analysis-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 15px;
+            background: #1a76d1;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background 0.3s;
+        }
+        .analysis-button:hover {
+            background: #0d47a1;
+        }
+        .status-message {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status-success { background-color: #dff0d8; color: #3c763d; }
+        .status-error { background-color: #f2dede; color: #a94442; }
+    </style>
+</head>
+<body>
+    <center>
+    <header class="header" style="text-align: center;">
+        <div class="topbar">
+        </div>
+        <div class="header-inner">
+            <div class="container">
+                <div class="inner" style="text-align: center;">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-12">
+                            <div style="align-items: center; display: flex; margin-bottom: 50px;" class="logo">
+                                <a  href="/"><img style="border-left: 30px;" src="img/logo.png" alt="#"></a>
+                            </div>
+                        </div>
+                        <div class="col-lg-7 col-md-9 col-12">
+                            <div class="main-menu" style="align-items: center;">
+                                <nav class="navigation" style="margin-top: 150px;">
+                                    <ul class="nav menu">
+                                        <li><a href="/">Home |</a></li>
+                                        <li class="active"><a href="/myData.html">&nbsp; My Data |</a></li>
+                                        <li><a href="/relax.html"> &nbsp;Relax & Games |</a></li>
+                                        <li><a href="#">&nbsp; Services |</a></li>
+                                        <li><a href="contact.html"> &nbsp;Contact Us</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .chart {
+            background: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .chart:hover {
+            transform: scale(1.05);
+        }
+
+        iframe {
+            border-radius: 8px;
+            border: none;
+        }
+    </style>
+
+    <h1>Live Health Data Charts</h1>
+    
+    <div class="container">
+        <div class="chart">
+            <iframe width="450" height="260" src="https://thingspeak.com/channels/2812750/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line"></iframe>
+        </div>
+        <div class="chart">
+            <iframe width="450" height="260" src="https://thingspeak.com/channels/2812750/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Heart+Rate&type=line"></iframe>
+        </div>
+        <div class="chart">
+            <iframe width="450" height="260" src="https://thingspeak.com/channels/2812750/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+        </div>
+    </div>
+</center>
+
+
+    <script>
+        // Initialize Socket.IO
+        const socket = io();
+        let chart = null;
+
+        // Setup WebSocket handlers
+        socket.on('connect', () => {
+            console.log('Connected to server');
+            showStatus('Connected to sensor stream', 'success');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+            showStatus('Connection lost - reconnecting...', 'error');
+        });
+
+        socket.on('sensor_update', (data) => {
+            updateDisplays(data);
+            updateChart(data);
+        });
+
+        function initializeChart() {
+            const ctx = document.getElementById('liveChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Heart Rate',
+                        data: [],
+                        borderColor: 'rgb(255, 99, 132)',
+                        yAxisID: 'y1'
+                    }, {
+                        label: 'GSR',
+                        data: [],
+                        borderColor: 'rgb(54, 162, 235)',
+                        yAxisID: 'y2'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y1: {
+                            type: 'linear',
+                            position: 'left',
+                            title: { display: true, text: 'Heart Rate (BPM)' }
+                        },
+                        y2: {
+                            type: 'linear',
+                            position: 'right',
+                            title: { display: true, text: 'GSR' }
+                        }
+                    },
+                    animation: false
+                }
+            });
+        }
+
+        function updateDisplays(data) {
+            document.getElementById('heartRate').textContent = `Heart Rate: ${data.HeartRate} BPM`;
+            document.getElementById('gsrValue').textContent = `GSR: ${data.GSR}`;
+            document.getElementById('lastUpdate').textContent = `Last Update: ${data.timestamp}`;
+        }
+
+        function updateChart(data) {
+            if (!chart) return;
+
+            const maxPoints = 20;
+            
+            chart.data.labels.push(data.timestamp);
+            chart.data.datasets[0].data.push(data.HeartRate);
+            chart.data.datasets[1].data.push(data.GSR);
+
+            if (chart.data.labels.length > maxPoints) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+                chart.data.datasets[1].data.shift();
+            }
+
+            chart.update('none');
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.style.display = 'block';
+            setTimeout(() => statusDiv.style.display = 'none', 3000);
+        }
+
+        // Updated monitor launch handler
+        document.getElementById('startMonitor').addEventListener('click', function() {
+            const button = this;
+            const statusDiv = document.getElementById('statusMessage');
+            const errorDiv = document.getElementById('launchError');
+            
+            // Disable button while processing
+            button.disabled = true;
+            button.textContent = 'Launching...';
+            
+            fetch('/start-monitor')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        statusDiv.textContent = 'Analysis window launched';
+                        statusDiv.className = 'status-message status-success';
+                        statusDiv.style.display = 'block';
+                        errorDiv.style.display = 'none';
+                    } else {
+                        errorDiv.textContent = `Error: ${data.error}`;
+                        errorDiv.style.display = 'block';
+                        statusDiv.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Launch error:', error);
+                    errorDiv.textContent = 'Failed to launch analysis. Please try again.';
+                    errorDiv.style.display = 'block';
+                    statusDiv.style.display = 'none';
+                })
+                .finally(() => {
+                    // Re-enable button
+                    button.disabled = false;
+                    button.textContent = 'View Detailed Analysis';
+                    
+                    // Hide status messages after 5 seconds
+                    setTimeout(() => {
+                        statusDiv.style.display = 'none';
+                        errorDiv.style.display = 'none';
+                    }, 5000);
+                });
+        });
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeChart();
+        });
+    </script>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+</body>
+</html>
