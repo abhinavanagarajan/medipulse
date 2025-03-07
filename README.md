@@ -121,17 +121,13 @@ MediPulse ensures **secure guardian access**, real-time alerts, and **automated 
 
 ---
 ## **Contributors**
-- **[Your Name]** - Lead Developer
-- **[Team Member 1]** - AI/ML Engineer
-- **[Team Member 2]** - Frontend Developer
-- **[Team Member 3]** - Hardware Integration Specialist
+- **Abhinavanagarajan A** 
+- **Vishnu Swaroop G**
+- **Smitha Gladius TS**
+- **Swetha S**
 
 ---
 ## **License**
 MediPulse is an open-source project licensed under **MIT License**. Feel free to contribute and improve the platform.
 
----
-## **Contact**
-For queries or collaborations, reach out at:  
-9789032405
 
