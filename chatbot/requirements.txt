@@ -1,1 +1,14 @@
-
+torch
+transformers
+pandas
+scikit-learn
+flask
+beautifulsoup4
+requests
+PyPDF2
+nltk
+numpy
+google-generativeai
+joblib
+textblob
+pygame==2.5.2
