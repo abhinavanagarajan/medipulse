@@ -1,4 +1,4 @@
-# MediPulse - AI-Powered Healthcare Platform
+# MediPulse - AI-Powered Mental Wellness and Healthcare Platform
 
 ## **Introduction**
 MediPulse is an **AI-powered healthcare platform** designed for real-time monitoring, prediction, and management of stress, anxiety, trauma, and post-traumatic stress disorder (PTSD). It utilizes **biometric sensors, machine learning models, and adaptive relaxation techniques** to assist patients, caregivers, and healthcare professionals in proactive stress management.
